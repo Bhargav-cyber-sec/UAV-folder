@@ -1,0 +1,29 @@
+# Environments
+venv/
+__pycache__/
+*.pyc
+.env
+
+# Never commit raw footage or mission outputs
+data/input/
+data/output/
+*.mp4
+*.avi
+*.mov
+*.wav
+
+# Never commit model weights / offline install artifacts
+wheelhouse/
+models/
+*.pt
+*.onnx
+*.gguf
+
+# Logs
+*.log
+install_log.txt
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/

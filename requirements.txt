@@ -1,0 +1,9 @@
+# Target: Python 3.11, win_amd64
+# Phase 1 — core deps only. More added per phase (opencv/ultralytics in Phase 3,
+# faster-whisper in Phase 6, streamlit/reportlab in Phase 9, etc.)
+# CPU-only by default — safest for the P2000 until its exact driver/CUDA
+# version is confirmed on-site (see docs/design_review.md, section 14).
+
+pyyaml>=6.0
+python-dotenv>=1.0
+click>=8.1

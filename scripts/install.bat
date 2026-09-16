@@ -3,6 +3,10 @@ setlocal enabledelayedexpansion
 set LOG=install_log.txt
 echo Install started: %date% %time% > %LOG%
 
+echo [0/13] Verifying wheelhouse integrity (checking for transfer corruption)...
+powershell -ExecutionPolicy Bypass -File scripts\verify_hashes.ps1 >> %LOG% 2>&1
+if errorlevel 1 (echo Wheelhouse integrity check FAILED — re-transfer the package & goto :fail)
+
 echo [1/13] Checking Python...
 python --version >> %LOG% 2>&1
 if errorlevel 1 (echo Python not found on PATH & goto :fail)

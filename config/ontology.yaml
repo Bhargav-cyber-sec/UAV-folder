@@ -59,3 +59,20 @@ highlight:
   max_clip_duration_s: 45.0
   always_include_mission_start_s: 5
   always_include_mission_end_s: 5
+
+# Track continuity reconciliation (Phase 3-4) — closes the "same object counted
+# as disappear+appear" gap. A dropped track is held as a "ghost" for
+# ghost_window_s; a new track of the same class appearing within that window,
+# inside max_motion_radius_m (approximated from pixel displacement + elapsed
+# time), is relabeled as a continuation under a stable logical_id rather than
+# scored as two separate events.
+track_continuity:
+  ghost_window_s: 1.5
+  max_motion_radius_px: 120   # tune once real footage/altitude is known
+
+# Motion-compensation quality gate (Phase 4) — closes the featureless-terrain
+# failure mode. If the homography fit has too few inliers, compensation is
+# skipped for that frame pair and visual_change_norm falls back to 0
+# (YOLO/tracking signal only) instead of trusting an unstable warp.
+motion_compensation:
+  min_ransac_inliers: 15

@@ -16,6 +16,8 @@ data/output/
 tools/
 wheelhouse/
 models/
+hashes.sha256
+versions.txt
 *.pt
 *.onnx
 *.gguf

@@ -9,7 +9,7 @@ REM
 REM Edit PYVER below once you've confirmed the exact Python version installed
 REM on the facility PC (it must match, per docs/design_review.md section 14).
 
-set PYVER=311
+set PYVER=310
 set PLATFORM=win_amd64
 set OUTDIR=wheelhouse
 

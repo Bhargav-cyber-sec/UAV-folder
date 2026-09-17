@@ -22,13 +22,21 @@ echo [4/13] Installing from local wheelhouse (offline, no index)...
 venv\Scripts\pip install --no-index --find-links=wheelhouse -r requirements.txt >> %LOG% 2>&1
 if errorlevel 1 goto :fail
 
-echo [5/13] Verifying core imports...
-venv\Scripts\python -c "import yaml, dotenv, click" >> %LOG% 2>&1
+echo [4b/13] Installing torch/torchvision/ultralytics (not in requirements.txt
+echo         by design - see build_wheelhouse.bat comments)...
+venv\Scripts\pip install --no-index --find-links=wheelhouse torch torchvision >> %LOG% 2>&1
+if errorlevel 1 goto :fail
+venv\Scripts\pip install --no-index --find-links=wheelhouse ultralytics --no-deps >> %LOG% 2>&1
 if errorlevel 1 goto :fail
 
-echo [6/13] Checking FFmpeg on PATH...
-ffmpeg -version >> %LOG% 2>&1
-if errorlevel 1 (echo FFmpeg missing from PATH & goto :fail)
+echo [5/13] Verifying core imports...
+venv\Scripts\python -c "import yaml, dotenv, click, torch, torchvision, ultralytics, cv2, faster_whisper, streamlit, reportlab" >> %LOG% 2>&1
+if errorlevel 1 goto :fail
+
+echo [6/13] Checking bundled FFmpeg/FFprobe (tools\ffmpeg\bin, not system PATH)...
+if not exist tools\ffmpeg\bin\ffmpeg.exe (echo FFmpeg missing at tools\ffmpeg\bin\ffmpeg.exe - was it included in the transfer package? & goto :fail)
+if not exist tools\ffmpeg\bin\ffprobe.exe (echo FFprobe missing at tools\ffmpeg\bin\ffprobe.exe - was it included in the transfer package? & goto :fail)
+tools\ffmpeg\bin\ffmpeg.exe -version >> %LOG% 2>&1
 
 echo [7/13] Checking YOLO weights present... (skipped until Phase 3)
 echo [8/13] Checking Whisper model present... (skipped until Phase 6)

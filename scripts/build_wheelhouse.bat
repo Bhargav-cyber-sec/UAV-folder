@@ -1,13 +1,12 @@
 @echo off
 setlocal enabledelayedexpansion
-REM Run this at HOME (internet available). It downloads every package in
-REM requirements.txt, plus its full transitive dependency tree, as .whl files
-REM pinned to the facility PC's target Python/platform — NOT whatever Python
-REM version happens to be running this script. This is what makes the
-REM wheelhouse actually installable offline later via install.bat.
+REM Run this at HOME (internet available). Builds the full offline wheelhouse
+REM for everything Phases 1-6 need, pinned to the facility PC's Python/platform.
 REM
-REM Edit PYVER below once you've confirmed the exact Python version installed
-REM on the facility PC (it must match, per docs/design_review.md section 14).
+REM torch/torchvision and ultralytics are handled as SEPARATE steps below,
+REM deliberately not just listed in requirements.txt — see the comments in
+REM requirements.txt for why (short version: avoids silently downloading a
+REM multi-GB CUDA-bundled torch build on CPU-only hardware).
 
 set PYVER=310
 set PLATFORM=win_amd64
@@ -19,6 +18,40 @@ echo.
 
 if not exist %OUTDIR% mkdir %OUTDIR%
 
+echo [1/3] Downloading torch + torchvision from PyTorch's CPU-only index...
+echo       (NOT the default PyPI index - this is what keeps this small and CUDA-free)
+python -m pip download torch torchvision ^
+    --index-url https://download.pytorch.org/whl/cpu ^
+    -d %OUTDIR% ^
+    --python-version %PYVER% ^
+    --platform %PLATFORM% ^
+    --only-binary=:all:
+
+if errorlevel 1 (
+    echo.
+    echo FAILED downloading torch/torchvision CPU build. Check your internet
+    echo connection and that download.pytorch.org is reachable, then retry.
+    exit /b 1
+)
+
+echo.
+echo [2/3] Downloading ultralytics itself, --no-deps (its dependency list
+echo       includes torch, which we already fetched correctly above - letting
+echo       it resolve normally would re-trigger the CUDA-wheel problem)...
+python -m pip download ultralytics --no-deps ^
+    -d %OUTDIR% ^
+    --python-version %PYVER% ^
+    --platform %PLATFORM% ^
+    --only-binary=:all:
+
+if errorlevel 1 (
+    echo.
+    echo FAILED downloading ultralytics. Check the package name/version, then retry.
+    exit /b 1
+)
+
+echo.
+echo [3/3] Downloading everything else from requirements.txt (default PyPI)...
 python -m pip download -r requirements.txt ^
     -d %OUTDIR% ^
     --python-version %PYVER% ^
@@ -27,8 +60,9 @@ python -m pip download -r requirements.txt ^
 
 if errorlevel 1 (
     echo.
-    echo FAILED — a package has no matching wheel for cp%PYVER%/%PLATFORM%.
-    echo Check the package name/version above and adjust requirements.txt.
+    echo FAILED - a package in requirements.txt has no matching wheel for
+    echo cp%PYVER%/%PLATFORM%. Check the package name/version above and adjust
+    echo requirements.txt.
     exit /b 1
 )
 
@@ -46,6 +80,9 @@ echo Files:
 dir /b %OUTDIR%
 echo.
 echo Next: zip the whole project folder (including wheelhouse\, versions.txt,
-echo hashes.sha256) and transfer it to the facility PC via your approved channel.
-echo On the facility PC, run scripts\install.bat — it installs from this
-echo wheelhouse only, no internet required.
+echo hashes.sha256, tools\) and transfer it to the facility PC via your
+echo approved channel. On the facility PC, run scripts\install.bat.
+echo.
+echo NOTE: Ollama, the Qwen model file, the Whisper model file, and Piper
+echo voices are NOT included here - those come later, once Phases 4/5/6 are
+echo actually written and the exact model choices are locked in.

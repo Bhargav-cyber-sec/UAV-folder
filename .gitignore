@@ -13,6 +13,7 @@ data/output/
 *.wav
 
 # Never commit model weights / offline install artifacts
+tools/
 wheelhouse/
 models/
 *.pt

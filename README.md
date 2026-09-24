@@ -5,7 +5,7 @@ Raw UAV footage -> event detection -> adaptive highlight reel -> multilingual
 transcript -> fused evidence -> local LLM summary -> TTS briefing + PDF report
 -> Streamlit UI. Designed to run fully offline on a Windows 10 Pro workstation
 (Intel Xeon E-2176M, 16GB RAM, NVIDIA Quadro P2000 4GB, 1TB storage,
-Python 3.10). No CUDA toolkit, Ollama, or local LLM runtime is present on
+Python 3.14). No CUDA toolkit, Ollama, or local LLM runtime is present on
 that machine yet — the whole pipeline runs CPU-only until/unless that
 changes. Built solo; timeline target is 6-8 weeks.
 
@@ -30,18 +30,18 @@ src/ui/         Streamlit app (Week 6)
 scripts/        install.bat, build_wheelhouse.bat, smoke tests, dev utilities
 tests/          unit + integration tests
 docs/           architecture notes, known limitations, evaluation results
-wheelhouse/     (gitignored) offline pip wheels, cp310/win_amd64 — built at
+wheelhouse/     (gitignored) offline pip wheels, cp314/win_amd64 — built at
                 home, transferred separately (see docs/known_limitations.md)
 models/         (gitignored) YOLO/Whisper/Qwen/Piper weights — never committed
 ```
 
 ## Setup (Windows, at home — internet available)
 
-Target is Python 3.10 specifically (confirmed on the facility PC) — use the
-`py` launcher if 3.10 isn't your system default:
+Target is Python 3.14 specifically (confirmed on the facility PC) — use the
+`py` launcher if 3.14 isn't your system default:
 
 ```powershell
-py -3.10 -m venv venv
+py -3.14 -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
 ```

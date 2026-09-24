@@ -370,14 +370,14 @@ Key change from your original diagram: **Qwen3-VL is not a single monolithic sta
 **Provisioning strategy — build the wheelhouse and model cache at home, transfer once, install offline at DRDO.**
 
 1. **Pin your target environment first**, before downloading anything:
-   - Python version (recommend 3.10 or 3.11 — best current wheel availability for torch/onnxruntime as of major package ecosystems)
+   - Python version (recommend 3.14 or 3.15 — best current wheel availability for torch/onnxruntime as of major package ecosystems)
    - OS: Windows, get exact version from the facility PC (`winver`)
    - Architecture: `win_amd64` almost certainly, confirm it's not ARM64
    - GPU: Quadro P2000 → confirm installed driver version and CUDA capability *on that specific machine* (`nvidia-smi` when you're physically there Thu/Fri) before choosing a CUDA-enabled torch build; if driver/CUDA version is uncertain, default to CPU-only wheels for torch as the safe fallback and treat GPU acceleration as an opportunistic upgrade once confirmed.
 
 2. **Wheel compatibility mechanics:**
-   - Wheel filename encodes everything: `torch-2.x.x-cp311-cp311-win_amd64.whl` → `cp311` = CPython 3.11 built extension, `win_amd64` = platform tag. Both must match the target machine exactly.
-   - Build the wheelhouse with `pip download -r requirements.txt -d wheelhouse/ --python-version 3.11 --platform win_amd64 --only-binary=:all:` — this resolves and downloads the **full transitive dependency tree**, not just top-level packages.
+   - Wheel filename encodes everything: `torch-2.x.x-cp314-cp314-win_amd64.whl` → `cp314` = CPython 3.14 built extension, `win_amd64` = platform tag. Both must match the target machine exactly.
+   - Build the wheelhouse with `pip download -r requirements.txt -d wheelhouse/ --python-version 3.14 --platform win_amd64 --only-binary=:all:` — this resolves and downloads the **full transitive dependency tree**, not just top-level packages.
    - Record hashes: `pip download ... --no-binary :none:` plus a `pip freeze > versions.txt` / `pip hash` record for reproducibility and integrity verification after transfer.
 
 3. **Minimize wheelhouse + model size** (this matters a lot given your Drive/email-only transfer constraint):
@@ -569,7 +569,7 @@ exit /b 1
 
 1. **Project definition:** an offline, evidence-grounded UAV mission analysis pipeline that turns raw footage into an adaptive highlight reel, a multilingual transcript, an auditable structured evidence record, and an LLM-generated operational summary with audio briefing and PDF report — all running on a single air-gapped Windows workstation with a 4 GB GPU.
 2. **Architecture:** as in §13 — the key departure from your draft is splitting vision (cheap, sparse keyframe captioning) from reasoning (text-only Qwen3 over structured evidence), run strictly sequentially.
-3. **Stack:** Python 3.11, OpenCV, Ultralytics YOLO11n, ByteTrack, Faster-Whisper (CTranslate2, int8), Ollama + quantized Qwen3 (text) + optional small quantized VL model, Piper TTS, ReportLab, Streamlit, FFmpeg.
+3. **Stack:** Python 3.14, OpenCV, Ultralytics YOLO11n, ByteTrack, Faster-Whisper (CTranslate2, int8), Ollama + quantized Qwen3 (text) + optional small quantized VL model, Piper TTS, ReportLab, Streamlit, FFmpeg.
 4. **YOLO:** nano model, 2-5 fps sampling, 640px inference resolution mapped back to full-res, ByteTrack, COCO classes with documented gaps, fine-tune only if a labeled set materializes.
 5. **Whisper:** small/medium, int8, VAD-gated, auto language-ID per segment, original + English-normalized transcript both preserved.
 6. **Qwen strategy:** text-only Qwen3 for reasoning; small quantized VL model only for sparse keyframe captioning, never both loaded concurrently.

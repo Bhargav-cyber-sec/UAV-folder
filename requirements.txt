@@ -1,4 +1,4 @@
-# Target: Python 3.10, win_amd64 (confirmed installed on the facility PC —
+# Target: Python 3.14, win_amd64 (confirmed installed on the facility PC —
 # do not change without re-confirming on-site)
 # CPU-only, confirmed — no CUDA toolkit is installed on the facility PC.
 #
@@ -21,7 +21,7 @@ click>=8.1
 # --- Phase 2: media ingestion + YOLO/tracking ---
 # (torch/torchvision: see build_wheelhouse.bat, CPU index)
 opencv-python-headless>=4.9   # headless: no GUI libs needed, this runs without a display
-numpy>=1.26
+numpy>=2.0
 # ultralytics: see build_wheelhouse.bat (--no-deps), its own deps listed below
 matplotlib>=3.8
 pandas>=2.1

@@ -7,6 +7,15 @@ echo [0/13] Verifying wheelhouse integrity (checking for transfer corruption)...
 powershell -ExecutionPolicy Bypass -File scripts\verify_hashes.ps1 >> %LOG% 2>&1
 if errorlevel 1 (echo Wheelhouse integrity check FAILED — re-transfer the package & goto :fail)
 
+echo [0b/13] Checking Python 3.14 is installed (required — wheels are cp314)...
+py -3.14 --version >> %LOG% 2>&1
+if errorlevel 1 (
+    echo Python 3.14 not found. Install it first, then re-run this script:
+    echo   tools\python\python-3.14.7-amd64.exe /quiet InstallAllUsers=0 PrependPath=1
+    echo After install, close and reopen this Command Prompt, then retry.
+    goto :fail
+)
+
 echo [1/13] Checking Python...
 python --version >> %LOG% 2>&1
 if errorlevel 1 (echo Python not found on PATH & goto :fail)
@@ -15,7 +24,7 @@ echo [2/13] Checking architecture...
 python -c "import platform; print(platform.machine())" >> %LOG% 2>&1
 
 echo [3/13] Creating virtual environment...
-python -m venv venv >> %LOG% 2>&1
+py -3.14 -m venv venv >> %LOG% 2>&1
 if errorlevel 1 goto :fail
 
 echo [4/13] Installing from local wheelhouse (offline, no index)...

@@ -30,3 +30,6 @@ install_log.txt
 .DS_Store
 .vscode/
 .idea/
+
+# Large archives
+*.zip
